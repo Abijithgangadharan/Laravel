@@ -13,13 +13,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up PHP and Apache on Amazon Linux
+      - name: Set up PHP and Apache on Ubuntu
         run: |
-          sudo yum update -y
-          sudo amazon-linux-extras install -y php7.4
-          sudo yum install -y httpd
-          sudo systemctl start httpd
-          sudo systemctl enable httpd
+          sudo apt-get update -y
+          sudo apt-get install -y php7.4 apache2
+          sudo systemctl start apache2
+          sudo systemctl enable apache2
         shell: bash
 
       - name: Install Composer
