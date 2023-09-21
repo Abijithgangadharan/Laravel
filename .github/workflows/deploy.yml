@@ -1,0 +1,44 @@
+name: Deploy Laravel App
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up PHP and Apache on Amazon Linux
+        run: |
+          sudo yum update -y
+          sudo amazon-linux-extras install -y php7.4
+          sudo yum install -y httpd
+          sudo systemctl start httpd
+          sudo systemctl enable httpd
+        shell: bash
+
+      - name: Install Composer
+        run: |
+          curl -sS https://getcomposer.org/installer | php
+          sudo mv composer.phar /usr/local/bin/composer
+        working-directory: ${{ github.workspace }}
+
+      - name: Install dependencies
+        run: composer install
+
+      - name: Configure Laravel Environment
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+          php artisan config:cache
+          php artisan route:cache
+        env:
+          APP_ENV: production
+          APP_DEBUG: false
+        working-directory: ${{ github.workspace }}
+
